@@ -8,7 +8,7 @@ import { Department } from './entities/department.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: './database.sql',
+      database: './database.db',
       entities: [User, Department],
       synchronize: process.env.NODE_ENV === 'production' ? false : true,
     }),
