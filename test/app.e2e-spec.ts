@@ -68,12 +68,13 @@ describe('AppController (e2e)', () => {
       pactum.spec().post('/auth/login')
         .withGraphQLQuery(`
           mutation {
-              signup(user_input: {
+              login(user_input: {
                 username: ${faker.person.firstName},
                 password: ${faker.internet.password}
               }){
                 status
                 message
+                token
               }
             }
       `)
