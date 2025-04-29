@@ -1,4 +1,5 @@
 import { Directive, Field, ID, InputType, ObjectType } from '@nestjs/graphql';
+import { IsString, IsStrongPassword } from 'class-validator';
 
 @ObjectType({ description: 'user' })
 export class User {
@@ -19,16 +20,27 @@ export class gqlResponse {
 
   @Field()
   status: number;
+}
 
-  @Field({ nullable: true })
-  data?: Object;
+@ObjectType({ description: 'loginResponse' })
+export class loginResponse {
+  @Field()
+  message: string;
+
+  @Field()
+  status: number;
+
+  @Field({nullable: true})
+  token?: string;
 }
 
 @InputType()
 export class UserInput {
   @Field()
+  @IsString()
   username: string;
 
   @Field()
+  @IsStrongPassword()
   password: string;
 }

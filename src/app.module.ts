@@ -6,16 +6,23 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
+import { ConfigModule } from '@nestjs/config';
+
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: true,
+      graphiql: true
     }),
     DatabaseModule,
     AuthModule,
     DepartmentModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    
   ],
   controllers: [],
   providers: [AppService, AppResolver],

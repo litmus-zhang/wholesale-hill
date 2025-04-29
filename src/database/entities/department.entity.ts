@@ -8,6 +8,6 @@ export class Department {
   @Column()
   name: string;
 
-  @Column()
-  subDepartments: string;
+  // @Column({ nullable: true})
+  // subDepartments: Department[];
 }

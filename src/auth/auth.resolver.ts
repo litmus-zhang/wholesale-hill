@@ -1,14 +1,17 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { gqlResponse, User, UserInput } from './models/user.model';
+import { gqlResponse, User, UserInput, loginResponse } from './models/user.model';
 import { AuthService } from './auth.service';
-import { Body, NotFoundException } from '@nestjs/common';
 
 @Resolver((of) => User)
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation((returns) => User)
-  async signup(@Body('user_input') dto: UserInput): Promise<gqlResponse> {
+  @Mutation((returns) => gqlResponse)
+  async signup(@Args('user_input') dto: UserInput): Promise<gqlResponse> {
     return this.authService.signup(dto);
+  }
+  @Mutation((returns) => loginResponse)
+  async login(@Args('user_input') dto: UserInput): Promise<loginResponse> {
+    return this.authService.login(dto);
   }
 }

@@ -10,7 +10,7 @@ import { Department } from './entities/department.entity';
       type: 'sqlite',
       database: './database.sql',
       entities: [User, Department],
-      synchronize: process.env.NODE_ENV === 'production' ? true : false,
+      synchronize: process.env.NODE_ENV === 'production' ? false : true,
     }),
   ],
   controllers: [],

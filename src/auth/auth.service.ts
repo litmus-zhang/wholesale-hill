@@ -1,15 +1,19 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
-import { gqlResponse, UserInput } from './models/user.model';
-import { User } from 'src/database/entities/user.entity';
+import { BadRequestException, ForbiddenException, HttpStatus, Injectable } from '@nestjs/common';
+import { gqlResponse, UserInput , loginResponse} from './models/user.model';
+import { User } from '../database/entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as crypto from 'crypto-js';
+import * as argon from 'argon2';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private userRepository: Repository<User>,
+    private jwt: JwtService,
+    private config: ConfigService,
   ) {}
   async signup(dto: UserInput): Promise<gqlResponse> {
     try {
@@ -20,6 +24,7 @@ export class AuthService {
       if (user) {
         throw new BadRequestException('user already exists');
       }
+      console.log({dto})
 
       // Hash password with Argon2
       const hash = await argon.hash(dto.password);
@@ -44,7 +49,45 @@ export class AuthService {
     }
   }
 
-  async login() {
-    return {} as any;
+  async login(dto: UserInput): Promise<loginResponse> {
+    try{
+      // check if username 
+      const user = await this.userRepository.findOneBy({
+          username: dto.username,
+        
+      });
+      if (!user) throw new ForbiddenException('Invalid credentials');
+      const passwordMatch = await argon.verify(user.password, dto.password);
+      if (!passwordMatch) throw new ForbiddenException('Invalid credentials');
+  
+      const token = await this.signToken(user.id, user.username);
+      return {
+        message: 'user login successfully', 
+        status: HttpStatus.ACCEPTED,
+        token: token.access_token
+      }
+      
+
+    }catch(err){
+      return {
+        message: 'Error Login in user: ' + err.message,
+        status: HttpStatus.BAD_REQUEST,
+        token: null
+      };
+    }
+  }
+
+  async signToken(
+    userId: number,
+    username: string,
+  ): Promise<{ access_token: string }> {
+    const payload = { sub: userId, username };
+    const token = await this.jwt.signAsync(payload, {
+      expiresIn: '15m',
+      secret: this.config.get('JWT_SECRET'),
+    });
+    return {
+      access_token: token,
+    };
   }
 }
