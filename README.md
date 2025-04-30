@@ -3,6 +3,9 @@
 This application is created with Nestjs x Typeorm x Graphql
 
 
+N.B: Live URL: [Graphql Playground Here](https://wholesale-hill.onrender.com/graphql)
+
+
 
 
 
